@@ -40,51 +40,6 @@ if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST' |
 		if ($_POST['type'] == 'create_antrian') {
 
 
-			// // if (isset($_POST['cek_koneksi_printer']) && $_POST['cek_koneksi_printer'] == true) {
-
-			// 	// Ambil setting printer dari database
-			// 	$querySetting = $action->getSetting();
-			// 	$rows = mysqli_num_rows($querySetting);
-
-			// 	if ($rows > 0) {
-			// 		$data = mysqli_fetch_assoc($querySetting);
-			// 		$config = $data;
-			// 	} else {
-			// 		$config = [];
-			// 	}
-
-			// 	// Cek koneksi ke printer
-			// 	$printer_setting = !empty($config['printer']) ? $config['printer'] : [];
-			// 	$ip = !empty($printer_setting["ip_komputer_printer"]) ? $printer_setting["ip_komputer_printer"] : "127.0.0.1";
-			// 	$port = !empty($printer_setting['port_komputer_printer']) ? $printer_setting['port_komputer_printer'] : "3000";
-			// 	$url = $ip . ":" . $port . "/testkoneksi";
-
-			// 	$curl = curl_init();
-			// 	curl_setopt($curl, CURLOPT_URL, $url);
-			// 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			// 	curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-			// 	curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-
-			// 	$response = curl_exec($curl);
-			// 	$error = curl_error($curl);
-			// 	curl_close($curl);
-
-			// 	if ($error) {
-			// 		echo json_encode([
-			// 			'success' => false,
-			// 			'message' => 'Tidak bisa terkoneksi ke printer: ' . $error
-			// 		]);
-			// 	} else {
-			// 		echo json_encode([
-			// 			'success' => true,
-			// 			'message' => 'Terhubung ke printer.',
-			// 			'response' => $response
-			// 		]);
-			// 	}
-			// 	// }
-				
-			// die;
-
 			$code_antrian = $_POST['code_antrian'];
 
 			$query = $action->getLastAntrianByType($code_antrian);
@@ -133,7 +88,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST' |
 				}
 
 				// Cetak hanya jika sukses
-				cetak($no_antrian, $code_antrian, $data);
+				// cetak($no_antrian, $code_antrian, $data);
+
 			} else {
 				echo json_encode([
 					'success' => true,

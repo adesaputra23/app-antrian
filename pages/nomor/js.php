@@ -68,7 +68,7 @@
 				success: function(result) {
 					if (result.success == true) {
 						let no_antrian = result.data.code_antrian + result.data.no_antrian;
-						// printAntrian(no_antrian);
+						printAntrian(no_antrian);
 						getAntrian();
 					} else {
 						alert('Eits ada masalah nih, hubungi IT Support yaa!');
@@ -105,60 +105,121 @@
 	function printAntrian(nomorAntrian) {
 
 
-		// Buat elemen div baru untuk konten yang akan dicetak
-		const printWindow = document.createElement('div');
-		printWindow.innerHTML = `
+		// Jangan tampilkan kertas kosong
+		if (!nomorAntrian || typeof nomorAntrian !== "string" || nomorAntrian.trim() === "" || nomorAntrian === "undefined" || nomorAntrian === "null") {
+			return;
+		}
+
+		// Buat iframe tersembunyi untuk mencetak agar tidak muncul kertas kosong pada parent
+		const iframe = document.createElement('iframe');
+		iframe.style.position = "fixed";
+		iframe.style.right = "0";
+		iframe.style.bottom = "0";
+		iframe.style.width = "0";
+		iframe.style.height = "0";
+		iframe.style.border = "0";
+		iframe.style.visibility = "hidden";
+		document.body.appendChild(iframe);
+
+		const doc = iframe.contentWindow || iframe.contentDocument;
+		const win = iframe.contentWindow || iframe;
+
+		const printContent = `
+			<!DOCTYPE html>
+			<html>
+			<head>
+			<meta charset="utf-8">
+			<title>Antrian Cetak</title>
 			<style>
 			@media print {
 				body * {
-				visibility: hidden;
+					visibility: hidden !important;
 				}
-				#print-area * {
-				visibility: visible;
+				#print-area, #print-area * {
+					visibility: visible !important;
 				}
 				#print-area {
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
+					position: absolute !important;
+					top: 0;
+					left: 0;
+					width: 40mm !important;
+					min-width: 0 !important;
+					max-width: none !important;
+					height: auto !important;
+					box-sizing: border-box;
+					display: block !important;
+					margin: 0 !important;
+					padding: 0 !important;
+					background: white !important;
+					page-break-after: avoid !important;
 				}
 				.ticket {
-				border: 2px dashed #000;
-				padding: 20px;
-				text-align: center;
+					border: 1px dashed #000;
+					text-align: center;
+					width: 36mm;
+					min-width: 30mm;
+					max-width: 38mm;
+					margin: 0 auto;
+					background: #fff;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					padding: 10px 0;
+					/* Tambahkan margin top agar tidak nempel header */
+					margin-top: 14px !important;
 				}
 				.queue-number {
-				font-size: 3em;
-				font-weight: bold;
-				margin-bottom: 10px;
+					font-size: 1.5em;
+					font-weight: bold;
+					margin-bottom: 5px;
+					letter-spacing: 0.1em;
+					margin-top: 10px !important; /* Tambah margin top untuk nomor antrian */
 				}
 				.info {
-				font-size: 1em;
+					font-size: 0.85em;
+					margin-bottom: 3px;
+				}
+				html, body {
+					width: 40mm !important;
+					height: auto !important;
+					overflow: visible !important;
+					background: white !important;
+					margin: 0 !important;
+					padding: 0 !important;
 				}
 			}
+			@page {
+				size: 40mm 60mm;
+				margin: 0mm;
+			}
 			</style>
-			<div id="print-area">
-			<div class="ticket">
-				<div class="queue-number">${nomorAntrian}</div>
-				<div class="info">Silakan menunggu</div>
-				<div class="info">Akan dipanggil sesuai urutan</div>
-			</div>
-			</div>
+			</head>
+			<body>
+				<div id="print-area">
+					<div class="ticket">
+						<div class="queue-number">${nomorAntrian}</div>
+						<div class="info">Silakan menunggu</div>
+						<div class="info">Akan dipanggil sesuai urutan</div>
+					</div>
+				</div>
+			</body>
+			</html>
 		`;
 
-		// Tambahkan elemen ke body
-		document.body.appendChild(printWindow);
+		// Tulis konten ke iframe dan cetak, lalu hapus iframe
+		const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+		iframeDoc.open();
+		iframeDoc.write(printContent);
+		iframeDoc.close();
 
-		// Cetak konten
-		window.print();
-
-		// Hapus elemen setelah dicetak (opsional)
-		document.body.removeChild(printWindow);
+		iframe.onload = function() {
+			setTimeout(function() {
+				win.focus();
+				win.print();
+				document.body.removeChild(iframe);
+			}, 200);
+		};
 	}
 
 	function showPoli() {
