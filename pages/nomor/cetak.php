@@ -18,33 +18,32 @@ function cetak($no_antrian, $code_antrian, $config)
         "config" => $config
     ];
 
-    $curl = curl_init();
-    curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-    $response = curl_exec($curl);
-    $err      = curl_error($curl);
+    // Kirim permintaan POST ke server printer menggunakan @fsockopen
+    $parsed_url = parse_url("http://$url"); // $url sudah berisi ip:port/path
+    $host = $parsed_url['host'] ?? '127.0.0.1';
+    $port = $parsed_url['port'] ?? 80;
+    $path = $parsed_url['path'] ?? '/printantrian';
 
-    // Cek apakah request berhasil terkirim ke printer
-    if ($response === false) {
-        // Jika curl_exec gagal, berarti tidak dapat terhubung ke printer
-        throw new Exception("Gagal terkoneksi dengan printer di $ip:$port. Error: $err");
-    } else {
-        // Optional: cek respon dari printer (misal perlu validasi json dan success)
-        $resJson = json_decode($response, true);
-        if (is_array($resJson) && isset($resJson['success']) && $resJson['success'] === false) {
-            throw new Exception("Printer merespon gagal: " . ($resJson['message'] ?? 'Unknown error'));
+    // Siapkan data json dan headers
+    $payload = json_encode($data);
+    $headers = "POST $path HTTP/1.1\r\n";
+    $headers .= "Host: $host\r\n";
+    $headers .= "Content-Type: application/json\r\n";
+    $headers .= "Content-Length: " . strlen($payload) . "\r\n";
+    $headers .= "Connection: Close\r\n\r\n";
+
+    $timeout = 5;
+    $fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
+    $response = '';
+    if ($fp) {
+        fwrite($fp, $headers . $payload);
+        stream_set_timeout($fp, $timeout);
+        while (!feof($fp)) {
+            $response .= fgets($fp, 1024);
         }
-        // Jika perlu log response printer untuk debugging
-        // file_put_contents('printer_debug.log', $response . PHP_EOL, FILE_APPEND);
-    }
-
-    curl_close($curl);
-    if ($err) {
-        echo $err;
+        fclose($fp);
+    } else {
+        // Jika gagal konek, echo error
+        echo "Printer connection error: $errstr ($errno)";
     }
 }
