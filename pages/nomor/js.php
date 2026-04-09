@@ -68,7 +68,7 @@
 				success: function(result) {
 					if (result.success == true) {
 						let no_antrian = result.data.code_antrian + result.data.no_antrian;
-						printAntrian(no_antrian);
+						// printAntrian(no_antrian);
 						getAntrian();
 					} else {
 						alert('Eits ada masalah nih, hubungi IT Support yaa!');

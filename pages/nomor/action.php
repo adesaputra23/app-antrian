@@ -88,7 +88,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST' |
 				}
 
 				// Cetak hanya jika sukses
-				// cetak($no_antrian, $code_antrian, $data);
+				cetak($no_antrian, $code_antrian, $data);
 
 			} else {
 				echo json_encode([

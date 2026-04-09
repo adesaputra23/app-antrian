@@ -53,7 +53,7 @@ $baseUrl = $protocol . "://" . $host . '/' . $projectFolder;
 
 		<div class="row g-4">
 			<div class="col-sm-9 col-md-12">
-				<div class="row row-cols-3 justify-content-lg">
+				<div class="row row-cols-12 justify-content-lg">
 					<?php if (count($list_type_antrian) > 0): ?>
 						<?php foreach ($list_type_antrian as $lta): ?>
 							<div class="col mb-4 d-none kategori-antrian" id="<?= $lta['code_antrian']; ?>">

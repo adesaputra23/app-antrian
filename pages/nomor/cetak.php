@@ -29,6 +29,20 @@ function cetak($no_antrian, $code_antrian, $config)
     $response = curl_exec($curl);
     $err      = curl_error($curl);
 
+    // Cek apakah request berhasil terkirim ke printer
+    if ($response === false) {
+        // Jika curl_exec gagal, berarti tidak dapat terhubung ke printer
+        throw new Exception("Gagal terkoneksi dengan printer di $ip:$port. Error: $err");
+    } else {
+        // Optional: cek respon dari printer (misal perlu validasi json dan success)
+        $resJson = json_decode($response, true);
+        if (is_array($resJson) && isset($resJson['success']) && $resJson['success'] === false) {
+            throw new Exception("Printer merespon gagal: " . ($resJson['message'] ?? 'Unknown error'));
+        }
+        // Jika perlu log response printer untuk debugging
+        // file_put_contents('printer_debug.log', $response . PHP_EOL, FILE_APPEND);
+    }
+
     curl_close($curl);
     if ($err) {
         echo $err;
