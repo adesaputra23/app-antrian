@@ -18,32 +18,31 @@ function cetak($no_antrian, $code_antrian, $config)
         "config" => $config
     ];
 
-    // Kirim permintaan POST ke server printer menggunakan @fsockopen
-    $parsed_url = parse_url("http://$url"); // $url sudah berisi ip:port/path
-    $host = $parsed_url['host'] ?? '127.0.0.1';
-    $port = $parsed_url['port'] ?? 80;
-    $path = $parsed_url['path'] ?? '/printantrian';
 
-    // Siapkan data json dan headers
-    $payload = json_encode($data);
-    $headers = "POST $path HTTP/1.1\r\n";
-    $headers .= "Host: $host\r\n";
-    $headers .= "Content-Type: application/json\r\n";
-    $headers .= "Content-Length: " . strlen($payload) . "\r\n";
-    $headers .= "Connection: Close\r\n\r\n";
+    $timeout = 10;
+    $socket = @fsockopen("192.168.0.133", 3000, $errno, $errstr, $timeout);
 
-    $timeout = 5;
-    $fp = @fsockopen($host, $port, $errno, $errstr, $timeout);
-    $response = '';
-    if ($fp) {
-        fwrite($fp, $headers . $payload);
-        stream_set_timeout($fp, $timeout);
-        while (!feof($fp)) {
-            $response .= fgets($fp, 1024);
-        }
-        fclose($fp);
+    if (!$socket) {
+        echo "Gagal konek: $errstr ($errno)";
     } else {
-        // Jika gagal konek, echo error
-        echo "Printer connection error: $errstr ($errno)";
+        echo "Koneksi PHP ke Printer SUKSESS!";
+        fclose($socket);
+    }
+    
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+    $response = curl_exec($curl);
+    $err      = curl_error($curl);    
+
+    curl_close($curl);
+    if ($err) {
+        echo $err;
     }
 }
