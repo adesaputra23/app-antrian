@@ -39,7 +39,6 @@ if (isset($_SERVER['REQUEST_METHOD']) && ($_SERVER['REQUEST_METHOD'] == 'POST' |
 
 		if ($_POST['type'] == 'create_antrian') {
 
-
 			$code_antrian = $_POST['code_antrian'];
 
 			$query = $action->getLastAntrianByType($code_antrian);

@@ -67,7 +67,7 @@
 				},
 				success: function(result) {
 					if (result.success == true) {
-						let no_antrian = result.data.code_antrian + result.data.no_antrian;
+						// let no_antrian = result.data.code_antrian + result.data.no_antrian;
 						// printAntrian(no_antrian);
 						getAntrian();
 					} else {
@@ -80,7 +80,7 @@
 					if (loadExtractDataParse.success == true) {
 						getAntrian();
 						console.error('Printer error:', JSON.stringify(data));
-						alert(`Antrian anda ${loadExtractDataParse.data.code_antrian}${loadExtractDataParse.data.no_antrian} berhasil diambil, tapi printer bermasalah!`);
+						// alert(`Antrian anda ${loadExtractDataParse.data.code_antrian}${loadExtractDataParse.data.no_antrian} berhasil diambil, tapi printer bermasalah!`);
 					}
 				},
 				complete: function(data) {
